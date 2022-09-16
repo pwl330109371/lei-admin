@@ -1,28 +1,36 @@
 <template>
   <div class="login-container">
-    <el-form class="login-form">
+    <el-form :model="loginForm" :rules="loginRules" class="login-form">
       <div class="title-container">
         <h3 class="title">用户登录</h3>
       </div>
       <!-- username -->
-      <el-form-item>
+      <el-form-item prop="username">
         <span class="svg-container">
           <svg-icon icon="user"></svg-icon>
         </span>
-        <el-input placeholder="username" name="username" type="text"></el-input>
+        <el-input
+          placeholder="username"
+          v-model="loginForm.username"
+          name="username"
+          type="text"
+        ></el-input>
       </el-form-item>
       <!-- password -->
-      <el-form-item>
+      <el-form-item prop="password">
         <span class="svg-container">
           <svg-icon icon="password"></svg-icon>
         </span>
         <el-input
           placeholder="password"
+          v-model="loginForm.password"
           name="password"
-          type="password"
+          :type="passwordType"
         ></el-input>
-        <span class="show-pwd">
-          <svg-icon icon="eye"></svg-icon>
+        <span class="show-pwd" @click="handleChangePwd">
+          <svg-icon
+            :icon="passwordType === 'password' ? 'eye' : 'eye-open'"
+          ></svg-icon>
         </span>
       </el-form-item>
 
@@ -34,7 +42,46 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { ref } from 'vue'
+import { validatePassword } from './rules'
+
+// 数据源data
+const loginForm = ref({
+  username: 'super-admin',
+  password: '123456'
+})
+
+// 验证规则
+const loginRules = ref({
+  username: [
+    {
+      require: true,
+      trigger: 'blur',
+      message: '请输入用户名'
+    }
+  ],
+  password: [
+    {
+      require: true,
+      trigger: 'blur',
+      validator: validatePassword()
+    }
+  ]
+})
+
+// 处理密码明文
+const passwordType = ref('password')
+
+// template 中绑定方法 直接声明即可
+const handleChangePwd = () => {
+  if (passwordType.value === 'password') {
+    passwordType.value = 'text'
+  } else {
+    passwordType.value = 'password'
+  }
+}
+</script>
 <style lang="scss" scoped>
 $bg: #2d3a4b;
 $dark_gray: #889aa4;
